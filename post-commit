@@ -1,0 +1,18 @@
+#! /usr/bin/env bash
+
+gitdir=$(git rev-parse --show-toplevel)
+
+function run_hooks(){
+  while read hook; do
+    echo "$hook:"
+    "$hook" || (echo "failed to run: $hook" && exit 1)
+  done
+}
+
+function find_hooks(){
+  while read dir; do
+    findup "$dir:$gitdir" -name post-commit | head -1
+  done
+}
+
+git diff --name-only HEAD HEAD~1 | sort | xargs -n 1 realpath | xargs -n 1 dirname | uniq | find_hooks | uniq | run_hooks
