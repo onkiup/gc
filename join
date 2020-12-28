@@ -1,16 +1,44 @@
 #! /bin/bash
 
 # network join script
+# stores references to this host in files 'hosts/<IP>' on every 
+# network branch for each detected network
+
+if ! git diff --quiet; then
+  echo "Error: working tree is dirty."
+  echo "Commit the working tree and retry."
+  exit 1
+fi
 
 host=$(hostname)
+branch=$(git branch --show-current)
+
+hostver=$(git rev-parse "hosts/$host")
 
 function register_each_gateway() {
   while read gw; do
-    echo "Joining: $gw"
-    git checkout "network/$gw" || git checkout -B "network/$gw"
-    git subtree add --prefix="hosts/$host" "hosts/$host"
-    git commit -m "Host $host joined network $gw"
+    ifaceip=$(ping -R "$gw" -c 1 -w 1 | grep "RR" | awk '{print $2}')
+    if [ ! -z "$ifaceip" ]; then
+      echo "Joining: $gw as hosts/$host with ip $ifaceip"
+      git checkout "networks/$gw" || git checkout -B "networks/$gw"
+      mkdir -p hosts
+      echo "hosts/$host" > "hosts/$ifaceip"
+
+      git add "hosts/$ifaceip"
+      git commit -m "Host $host joined network $gw with ip $ifaceip"
+
+      git checkout "hosts/$host"
+      mkdir -p networks
+      echo "$ifaceip" > "networks/$gw"
+      git add "networks/$gw"
+      git commit -m "Joining network $gw with ip $ifaceip"
+
+    else
+      echo "Unable to determine interface ip for gateway $gw, skipping."
+    fi
   done
+  git checkout "$branch"
 }
 
 route -n | grep 'UG[ \t]' | awk '{print $2}' | register_each_gateway
+
