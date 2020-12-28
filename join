@@ -1,3 +1,8 @@
 #! /bin/bash
 
-echo "Joining this machine to your GC network"
+./leave
+
+useradd -m -U -G adm,sudo,ssh git-control
+sudo -u git-control git clone --bare . /home/git-control/control.git
+git checkout git/hooks
+sudo -u git-control ./join
