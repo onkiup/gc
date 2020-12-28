@@ -13,7 +13,7 @@ date=$(date)
 touch .joins
 echo "$hostid -- $date" >> .joins
 
-./join
+sudo ./join
 
-git commit -m "Host $host (id: $hostid) joined on $date"
-git push -u private
+echo git commit -m "Host $host (id: $hostid) joined on $date"
+echo git push -u private
