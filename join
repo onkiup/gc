@@ -1,3 +1,19 @@
 #! /bin/bash
 
-echo "Joining this machine to your GC network"
+host=$(hostname)
+
+echo "Joining this machine to your GC network as 'hosts/$host'"
+
+git checkout host
+(git checkout "hosts/$host" && echo "re-used existing configuration") || (echo "creating new configuration..." && git checkout -b "hosts/$host")
+
+hostid=$(cat /etc/machine-id)
+date=$(date)
+
+touch .joins
+echo "$hostid -- $date" >> .joins
+
+./join
+
+git commit -m "Host $host (id: $hostid) joined on $date"
+git push -u private
