@@ -1,5 +1,8 @@
 #! /bin/bash
 
-userdel git-control
-rm -Rf /home/git-control
+host=$(hostname)
+git branch -D "hosts/$host"
+
+sudo userdel git-control
+sudo rm -Rf /home/git-control
 
