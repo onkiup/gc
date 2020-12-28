@@ -5,6 +5,8 @@ host=$(hostname)
 echo "Joining this machine to your GC network as 'hosts/$host'"
 
 git checkout host
+./leave
+
 (git checkout "hosts/$host" && echo "re-used existing configuration") || (echo "creating new configuration..." && git checkout -b "hosts/$host")
 
 hostid=$(cat /etc/machine-id)
@@ -12,8 +14,11 @@ date=$(date)
 
 touch .joins
 echo "$hostid -- $date" >> .joins
+git add .joins
+git commit -m "Host $host (id: $hostid) joined on $date"
 
-sudo ./join
+./join
 
-echo git commit -m "Host $host (id: $hostid) joined on $date"
-echo git push -u private
+#git push --set-upstream origin "hosts/$host"
+
+git checkout main
