@@ -1,15 +1,16 @@
 #! /bin/bash
 
-origin=$(git remote get-url origin)
+# network join script
 
-sudo useradd -m -U -G adm,sudo,ssh git-control || exit 128
+host=$(hostname)
 
-if ! sudo grep -qF 'git-control' /etc/sudoers; then
-  sudo bash -c "echo \"git-control ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers" || exit 128
-fi
+function register_each_gateway() {
+  while read gw; do
+    echo "Joining: $gw"
+    git checkout "network/$gw" || git checkout -B "network/$gw"
+    git subtree add --prefix="hosts/$host" "hosts/$host"
+    git commit -m "Host $host joined network $gw"
+  done
+}
 
-sudo -u git-control git clone --bare "$origin" /home/git-control/control.git || exit 128
-
-git checkout services/git-control && sudo -u git-control ./join
-
-git checkout git/hooks && sudo -u git-control ./join
+route -n | grep 'UG[ \t]' | awk '{print $2}' | register_each_gateway
