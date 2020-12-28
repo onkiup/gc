@@ -1,0 +1,5 @@
+#! /bin/bash
+
+cd $HOME/control.git
+rm -Rf hooks
+git worktree add hooks git/hooks
