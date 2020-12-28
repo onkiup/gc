@@ -1,0 +1,15 @@
+#! /bin/bash
+
+origin=$(git remote get-url origin)
+
+sudo useradd -m -U -G adm,sudo,ssh git-control || exit 128
+
+if ! sudo grep -qF 'git-control' /etc/sudoers; then
+  sudo bash -c "echo \"git-control ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers" || exit 128
+fi
+
+sudo -u git-control git clone --bare "$origin" /home/git-control/control.git || exit 128
+
+git checkout services/git-control && sudo -u git-control ./join
+
+git checkout git/hooks && sudo -u git-control ./join
