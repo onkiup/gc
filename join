@@ -1,5 +1,7 @@
 #! /bin/bash
 
-cd $HOME/control.git
-rm -Rf hooks
-git worktree add hooks git/hooks
+HOME="/home/git-control"
+pushd "$HOME/control.git"
+  sudo rm -Rf hooks
+  sudo -u git-control git worktree add hooks git/hooks
+popd
