@@ -1,0 +1,3 @@
+#! /bin/bash
+
+echo "Joining this machine to your GC network"
