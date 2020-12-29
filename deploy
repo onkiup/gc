@@ -6,7 +6,7 @@ process_all() {
   while read ip; do
     if ping -c 1 -w 1 -q "$ip" > /dev/null; then
       echo "Deploying to $ip..."
-      git push "git-control@${ip}:control.git" "hosts/$host"
+      git push -f "git-control@${ip}:control.git" "hosts/$host"
     fi
   done
 }
