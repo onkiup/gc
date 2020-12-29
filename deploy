@@ -1,0 +1,9 @@
+#! /bin/bash
+
+host=$(hostname)
+
+while cat networks/* | read ip; do
+  if ping -c 1 -w 1 "$ip"; then
+    git push "git-control@${ip}:control.git" "hosts/$host"
+  fi
+done
