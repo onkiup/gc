@@ -1,7 +1,8 @@
 #! /bin/bash
 
 HOME="/home/git-control"
+sudo -u git-control git push -f "$HOME/control.git" git/hooks
 pushd "$HOME/control.git"
-  sudo rm -Rf hooks
+  sudo -u git-control git worktree remove --force hooks || sudo rm -Rf hooks
   sudo -u git-control git worktree add hooks git/hooks
 popd

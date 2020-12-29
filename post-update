@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+host=$(hostname)
+
+for refspec in "$@"; do
+  if [[ "$refspec" == "refs/heads/git/hooks" ]]; then
+    git worktree remove --force hooks || sudo rm -Rf hooks
+    git worktree add hooks git/hooks
+  elif [[ "$refcpec" == "refs/heads/hosts/$host" ]]; then
+    echo "POST-UPDATE $refspec"
+    worktree=$(mktemp -d)
+    git worktree add "$worktree" "$refspec"
+    pushd "$worktree" && (./post-update || echo "$refspec: post-update hook failed") && popd
+    git worktree remove "$worktree"
+  fi
+done
+
